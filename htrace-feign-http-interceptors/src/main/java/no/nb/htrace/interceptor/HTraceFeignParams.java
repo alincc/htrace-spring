@@ -18,9 +18,8 @@ public class HTraceFeignParams extends HTraceFeign {
     void extractSpan() {
         long traceId = getParam(template, HTraceHttpHeaders.TraceId.getName());
         long spanId = getParam(template, HTraceHttpHeaders.SpanId.getName());
-        long parentSpanId = getParam(template, HTraceHttpHeaders.ParentSpanId.getName());
 
-        this.span = new MilliSpan(null, traceId, parentSpanId, spanId, null);
+        this.span = new MilliSpan(null, traceId, 0, spanId, null);
     }
 
     private Long getParam(RequestTemplate template, String paramName) {
