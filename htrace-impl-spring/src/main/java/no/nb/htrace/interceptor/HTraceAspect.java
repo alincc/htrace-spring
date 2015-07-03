@@ -45,8 +45,12 @@ public class HTraceAspect {
 
         Object retVal = pjp.proceed();
         
-        traceScope.getSpan().addKVAnnotation("request".getBytes(), (getRequestFromContext().getMethod() + " " + getRequestFromContext().getRequestURI()).getBytes());
-        traceScope.getSpan().addKVAnnotation("http.responsecode".getBytes(), (""+getResponseFromContext().getStatus()).getBytes());
+        try {
+            traceScope.getSpan().addKVAnnotation("request".getBytes(), (getRequestFromContext().getMethod() + " " + getRequestFromContext().getRequestURI()).getBytes());
+            traceScope.getSpan().addKVAnnotation("http.responsecode".getBytes(), (""+getResponseFromContext().getStatus()).getBytes());
+        } catch(Exception ex) {
+            //Nothing to do
+        }
 
         traceScope.close();
 
