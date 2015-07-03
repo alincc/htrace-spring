@@ -29,6 +29,25 @@
         <module>htrace-zuul-filters</module>
   </modules>
     
+    <scm>
+        <url>https://github.com/NationalLibraryOfNorway/htrace-spring.git</url>
+        <connection>scm:git:git://github.com/NationalLibraryOfNorway/htrace-spring.git</connection>
+        <developerConnection>scm:git:git@github.com:NationalLibraryOfNorway/htrace-spring.git</developerConnection>
+    </scm>
+    
+    <distributionManagement>
+        <snapshotRepository>
+            <id>snapshots</id>
+            <name>NB Snapshot Repository</name>
+            <url>http://utvikling.nb.no:8091/artifactory/libs-snapshots-local</url>
+        </snapshotRepository>
+        <repository>
+            <id>releases</id>
+            <name>NB Release Repository</name>
+            <url>http://utvikling.nb.no:8091/artifactory/libs-releases-local</url>
+        </repository>
+    </distributionManagement>
+    
     <dependencies>
         <dependency>
             <groupId>org.apache.htrace</groupId>
