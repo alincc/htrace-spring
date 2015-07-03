@@ -16,11 +16,13 @@ public abstract class HTraceFeign {
     
     public void setHeaders() {
         extractSpan();
-        template.header(HTraceHttpHeaders.TraceId.getName(), ""+span.getTraceId());
-        template.header(HTraceHttpHeaders.SpanId.getName(), ""+span.getSpanId());
-        template.header(HTraceHttpHeaders.ParentSpanId.getName(), ""+span.getParentId());
-        template.header(HTraceHttpHeaders.Sampled.getName(), "1");
-        template.header(HTraceHttpHeaders.Flags.getName(), "1");
+        if (span != null) {
+            template.header(HTraceHttpHeaders.TraceId.getName(), ""+span.getTraceId());
+            template.header(HTraceHttpHeaders.SpanId.getName(), ""+span.getSpanId());
+            template.header(HTraceHttpHeaders.ParentSpanId.getName(), ""+span.getParentId());
+            template.header(HTraceHttpHeaders.Sampled.getName(), "1");
+            template.header(HTraceHttpHeaders.Flags.getName(), "1");
+        }
     }
     
     abstract void extractSpan();
