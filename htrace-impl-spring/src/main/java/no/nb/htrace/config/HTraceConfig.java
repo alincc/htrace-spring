@@ -21,10 +21,10 @@ import org.springframework.context.annotation.Configuration;
 @ConditionalOnWebApplication
 public class HTraceConfig {
 
-    @Value("${zipkin.collector-hostname}") 
-    private String collectorHostname = "localhost";
+    @Value("${zipkin.collector-hostname ?: 'localhost'}") 
+    private String collectorHostname;
     
-    @Value("${spring.application.name}") 
+    @Value("${spring.application.name ?: 'undefined'}") 
     public String serviceName;
 
     @PostConstruct

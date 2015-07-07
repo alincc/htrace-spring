@@ -5,6 +5,7 @@ import javax.servlet.http.HttpServletResponse;
 
 import no.nb.htrace.annotations.Traceable;
 
+import org.apache.htrace.Sampler;
 import org.apache.htrace.Trace;
 import org.apache.htrace.TraceInfo;
 import org.apache.htrace.TraceScope;
@@ -30,17 +31,12 @@ public class HTraceAspect {
             description = traceable.description();
         }
         if (Trace.isTracing()) {
-            System.out.println("IS TRACING");
-            System.out.println(Trace.currentSpan());
             traceScope = Trace.startSpan(description, Trace.currentSpan());
         } else  if (request.isTracing()) {
             TraceInfo parentSpan = request.getTraceInfo();
-            System.out.println("CONTINUING TRACING");
-            System.out.println(parentSpan);
             traceScope = Trace.startSpan(description, parentSpan);
         } else {
-            System.out.println("STARTIG NEW SPAN");
-            traceScope = Trace.startSpan(description);    
+            traceScope = Trace.startSpan(description, Sampler.ALWAYS);
         }
 
         Object retVal = pjp.proceed();
