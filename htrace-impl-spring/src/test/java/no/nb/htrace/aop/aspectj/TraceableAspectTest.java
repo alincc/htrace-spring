@@ -5,6 +5,9 @@ import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.apache.htrace.Sampler;
 import org.apache.htrace.Span;
 import org.apache.htrace.Trace;
@@ -49,46 +52,29 @@ public class TraceableAspectTest {
 
     @Test
     public void startNewTrace() throws Throwable {
-        
         mockAspectBehavior(new AnswereMock());
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/test");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        response.setStatus(HttpStatus.SC_ACCEPTED);
-        ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
-        RequestContextHolder.setRequestAttributes(attributes);
-        
+        mockRequest(new HashMap<>());
 
         Span result = (Span)aspect.process(pjp, traceable);
         
-        assertNotNull(result);
-        
         verify(pjp).proceed();
-    }
-
-    private void mockAspectBehavior(Answer<Span> answer) throws Throwable {
-        when(pjp.getSignature()).thenReturn(signature);
-        when(signature.getName()).thenReturn("coolMethod");
-        when(traceable.description()).thenReturn("some description");
-        when(pjp.proceed()).thenAnswer(answer);
+        assertNotNull(result);
     }
 
     @Test
     public void continueRemoteTrace() throws Throwable {
-
         mockAspectBehavior(new AnswereMock());
-        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/test");
-        request.addHeader(HTraceHttpHeaders.TRACE_ID, "123");
-        request.addHeader(HTraceHttpHeaders.SPAN_ID, "456");
-        MockHttpServletResponse response = new MockHttpServletResponse();
-        response.setStatus(HttpStatus.SC_ACCEPTED);
-        ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
-        RequestContextHolder.setRequestAttributes(attributes);
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HTraceHttpHeaders.TRACE_ID, "123");
+        headers.put(HTraceHttpHeaders.SPAN_ID, "456");
+        mockRequest(headers);
 
         Span result = (Span)aspect.process(pjp, traceable);
         
         verify(pjp).proceed();
         assertEquals(123, result.getTraceId());
     }
+
 
     @Test
     public void continueThreadTrace() throws Throwable {
@@ -102,6 +88,24 @@ public class TraceableAspectTest {
         assertNotNull(result);
         assertEquals(traceScope.getSpan().getTraceId(), result.getTraceId());
 
+    }
+
+    private void mockAspectBehavior(Answer<Span> answer) throws Throwable {
+        when(pjp.getSignature()).thenReturn(signature);
+        when(signature.getName()).thenReturn("coolMethod");
+        when(traceable.description()).thenReturn("some description");
+        when(pjp.proceed()).thenAnswer(answer);
+    }
+
+    private void mockRequest(Map<String, String> headers) {
+        MockHttpServletRequest request = new MockHttpServletRequest("GET", "/test");
+        
+        headers.forEach((name, value) -> 
+            request.addHeader(name, value));
+        MockHttpServletResponse response = new MockHttpServletResponse();
+        response.setStatus(HttpStatus.SC_ACCEPTED);
+        ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
+        RequestContextHolder.setRequestAttributes(attributes);
     }
 
     class AnswereMock implements Answer<Span> {
