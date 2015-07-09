@@ -6,7 +6,6 @@ import org.springframework.stereotype.Component;
 
 import feign.RequestInterceptor;
 import feign.RequestTemplate;
-import no.nb.htrace.core.HTraceHttpHeaders;
 
 @Component
 public class HTraceFeignInterceptor implements RequestInterceptor {
@@ -15,7 +14,7 @@ public class HTraceFeignInterceptor implements RequestInterceptor {
     public void apply(RequestTemplate requestTemplate) {
         
         TraceRequestTemplate traceRequestTemplate = new TraceRequestTemplate(requestTemplate);
-        traceRequestTemplate.addHeadersToTemplate(getCurrentSpan());
+        traceRequestTemplate.addTraceHeadersToTemplate(getCurrentSpan());
     }
 
     private Span getCurrentSpan() {

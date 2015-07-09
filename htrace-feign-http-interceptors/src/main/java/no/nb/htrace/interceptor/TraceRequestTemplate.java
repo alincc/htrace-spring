@@ -12,13 +12,13 @@ public class TraceRequestTemplate {
         this.requestTemplate = requestTemplate;
     }
 
-    public void addHeadersToTemplate(Span span) {
+    public void addTraceHeadersToTemplate(Span span) {
         if (span != null) {
-            requestTemplate.header(HTraceHttpHeaders.TraceId.getName(), ""+span.getTraceId());
-            requestTemplate.header(HTraceHttpHeaders.SpanId.getName(), ""+span.getSpanId());
-            requestTemplate.header(HTraceHttpHeaders.ParentSpanId.getName(), ""+span.getParentId());
-            requestTemplate.header(HTraceHttpHeaders.Sampled.getName(), "1");
-            requestTemplate.header(HTraceHttpHeaders.Flags.getName(), "1");
+            requestTemplate.header(HTraceHttpHeaders.TRACE_ID, ""+span.getTraceId());
+            requestTemplate.header(HTraceHttpHeaders.SPAN_ID, ""+span.getSpanId());
+            requestTemplate.header(HTraceHttpHeaders.PARENT_SPAN_ID, ""+span.getParentId());
+            requestTemplate.header(HTraceHttpHeaders.SAMPLED, "1");
+            requestTemplate.header(HTraceHttpHeaders.FLAGS, "1");
         }
     }
 

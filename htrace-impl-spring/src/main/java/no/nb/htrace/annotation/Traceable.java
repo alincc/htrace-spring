@@ -1,4 +1,4 @@
-package no.nb.htrace.annotations;
+package no.nb.htrace.annotation;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
