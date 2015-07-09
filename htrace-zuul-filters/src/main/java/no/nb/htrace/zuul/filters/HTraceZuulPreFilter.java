@@ -1,16 +1,15 @@
 package no.nb.htrace.zuul.filters;
 
-import java.util.UUID;
-
 import javax.servlet.http.HttpServletRequest;
 
-import org.apache.htrace.Span;
+import org.apache.htrace.Sampler;
 import org.apache.htrace.Trace;
-import org.apache.htrace.TraceInfo;
-import org.apache.htrace.impl.MilliSpan;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
+
+import no.nb.htrace.aop.aspectj.TraceableRequest;
+import no.nb.htrace.core.HTraceHttpHeaders;
 
 public class HTraceZuulPreFilter extends ZuulFilter  {
 
@@ -21,52 +20,15 @@ public class HTraceZuulPreFilter extends ZuulFilter  {
 
     @Override
     public Object run() {
+        Trace.setProcessId("zuul");
         RequestContext.getCurrentContext().set("javaPreFilter-ran", true);
 
-        HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
-        
-        long traceId = 0;
-        long spanId = 0;
-        long parentSpanId = 0;
-        
-        String desccription = "zuul";
-        
-        long zipkinId = UUID.randomUUID().getLeastSignificantBits();
-        if (request.getHeader("X-B3-TraceId") != null) {
-            traceId = new Long(request.getHeader("X-B3-TraceId"));
-        } else {
-            traceId = zipkinId;
-        }
-        
-        if (request.getHeader("X-B3-SpanId") != null) {
-            spanId = new Long(request.getHeader("X-B3-SpanId"));
-        } else {
-            spanId = zipkinId;
-        }
-        
-        if (request.getHeader("X-B3-ParentSpanId") != null) {
-            parentSpanId = new Long(request.getHeader("X-B3-ParentSpanId"));
-        }
-        
-        if (request.getHeader("X-B3-TraceId") != null) {
-            Span parent = new MilliSpan.Builder().
-                description(request.getServletPath()).
-                traceId(traceId).
-                parents(new long[] {parentSpanId} ).
-                spanId(spanId).
-                processId("zuul").
-                begin(System.currentTimeMillis()).
-                build();
-            Trace.startSpan(desccription, parent);
-        } else {
-            TraceInfo info = new TraceInfo(traceId, spanId);
-            Trace.startSpan(desccription, info);
-        }
-        
+        TraceableRequest traceableRequest = new TraceableRequest("zuul");
+        traceableRequest.startTrace();
+
         RequestContext ctx = RequestContext.getCurrentContext();
-        ctx.addZuulRequestHeader("X-B3-TraceId", ""+traceId);
-        ctx.addZuulRequestHeader("X-B3-SpanId", ""+spanId);
-        ctx.addZuulRequestHeader("X-B3-ParentSpanId", ""+parentSpanId);
+        ctx.addZuulRequestHeader(HTraceHttpHeaders.TRACE_ID, ""+Trace.currentSpan().getTraceId());
+        ctx.addZuulRequestHeader(HTraceHttpHeaders.SPAN_ID, ""+Trace.currentSpan().getSpanId());
         
         return null;
     }

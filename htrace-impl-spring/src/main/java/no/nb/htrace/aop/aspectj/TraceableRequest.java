@@ -12,35 +12,35 @@ import org.apache.htrace.Trace;
 import org.apache.htrace.TraceInfo;
 import org.apache.htrace.TraceScope;
 import org.apache.htrace.impl.MilliSpan;
-import org.aspectj.lang.ProceedingJoinPoint;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import no.nb.htrace.annotation.Traceable;
 import no.nb.htrace.core.HTraceHttpHeaders;
 
 public class TraceableRequest {
     private final static Random random = new SecureRandom();
     
-    private Traceable traceable;
-    private ProceedingJoinPoint joinPoint;
     private HttpServletRequest request;
     private HttpServletResponse response;
     private TraceScope traceScope;
+    private String description;
 
-    public TraceableRequest(ProceedingJoinPoint joinPoint, Traceable traceable) {
+    public TraceableRequest() {
         super();
-        this.joinPoint = joinPoint;
-        this.traceable = traceable;
         this.request = getRequestFromContext();
         this.response = getResponseFromContext();
     }
 
+    public TraceableRequest(String description) {
+        this();
+        this.description = description;
+    }
+
     public void startTrace() {
         if (isTracing()) {
-            traceScope = Trace.startSpan(getDescriptionFromAnnotationOrMethodName(), getCurrentSpan());
+            traceScope = Trace.startSpan(getDescription(), getCurrentSpan());
         } else {
-            traceScope = Trace.startSpan(getDescriptionFromAnnotationOrMethodName(), Sampler.ALWAYS);
+            traceScope = Trace.startSpan(getDescription(), Sampler.ALWAYS);
         }
     }
 
@@ -77,7 +77,7 @@ public class TraceableRequest {
         if (Trace.isTracing()) {
             return Trace.currentSpan();
         } else {
-            return new MilliSpan(getDescriptionFromAnnotationOrMethodName(), getTraceId(), getSpanId(),
+            return new MilliSpan(getDescription(), getTraceId(), getSpanId(),
                     random.nextLong(), "Unknown");
         }
     }
@@ -98,11 +98,7 @@ public class TraceableRequest {
         return Long.parseLong(request.getHeader(HTraceHttpHeaders.TRACE_ID));
     }
 
-    public String getDescriptionFromAnnotationOrMethodName() {
-        String description = joinPoint.getSignature().getName();
-        if (!traceable.description().isEmpty()) {
-            description = traceable.description();
-        }
+    public String getDescription() {
         return description;
     }
 

@@ -13,7 +13,7 @@ public class TraceableAspect {
 
     @Around("@annotation(traceable)")
     public Object process(ProceedingJoinPoint pjp, Traceable traceable) throws Throwable {
-        TraceableRequest traceableRequest = new TraceableRequest(pjp, traceable);
+        AopTraceableRequest traceableRequest = new AopTraceableRequest(pjp, traceable);
 
         traceableRequest.startTrace();
         try {
