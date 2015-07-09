@@ -100,8 +100,9 @@ public class TraceableAspectTest {
     private void mockRequest(Map<String, String> headers) {
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/test");
         
-        headers.forEach((name, value) -> 
-            request.addHeader(name, value));
+        headers.forEach((name, value) -> {
+            request.addHeader(name, value);
+        });
         MockHttpServletResponse response = new MockHttpServletResponse();
         response.setStatus(HttpStatus.SC_ACCEPTED);
         ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
