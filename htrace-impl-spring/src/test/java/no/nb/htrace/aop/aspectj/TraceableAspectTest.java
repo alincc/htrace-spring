@@ -45,33 +45,17 @@ public class TraceableAspectTest {
     @Before
     public void setUp() {
         aspect = new TraceableAspect();
-        
     }
 
     @Test
     public void startNewTrace() throws Throwable {
-
         
+        mockAspectBehavior(new AnswereMock());
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/test");
         MockHttpServletResponse response = new MockHttpServletResponse();
         response.setStatus(HttpStatus.SC_ACCEPTED);
         ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
         RequestContextHolder.setRequestAttributes(attributes);
-        
-        when(pjp.getSignature()).thenReturn(signature);
-        when(signature.getName()).thenReturn("coolMethod");
-        when(traceable.description()).thenReturn("some description");
-        when(pjp.proceed()).thenAnswer(new Answer() {
-
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                if (!Trace.isTracing()) {
-                    throw new RuntimeException("Tracing not started");
-                };
-                return Trace.currentSpan();
-            }
-            
-        });
         
 
         Span result = (Span)aspect.process(pjp, traceable);
@@ -81,9 +65,17 @@ public class TraceableAspectTest {
         verify(pjp).proceed();
     }
 
+    private void mockAspectBehavior(Answer<Span> answer) throws Throwable {
+        when(pjp.getSignature()).thenReturn(signature);
+        when(signature.getName()).thenReturn("coolMethod");
+        when(traceable.description()).thenReturn("some description");
+        when(pjp.proceed()).thenAnswer(answer);
+    }
+
     @Test
     public void continueRemoteTrace() throws Throwable {
 
+        mockAspectBehavior(new AnswereMock());
         MockHttpServletRequest request = new MockHttpServletRequest("GET", "/test");
         request.addHeader(HTraceHttpHeaders.TRACE_ID, "123");
         request.addHeader(HTraceHttpHeaders.SPAN_ID, "456");
@@ -91,22 +83,6 @@ public class TraceableAspectTest {
         response.setStatus(HttpStatus.SC_ACCEPTED);
         ServletRequestAttributes attributes = new ServletRequestAttributes(request, response);
         RequestContextHolder.setRequestAttributes(attributes);
-
-        when(pjp.getSignature()).thenReturn(signature);
-        when(signature.getName()).thenReturn("coolMethod");
-        when(traceable.description()).thenReturn("some description");
-        when(pjp.proceed()).thenAnswer(new Answer() {
-
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                if (!Trace.isTracing()) {
-                    throw new RuntimeException("Tracing not started");
-                };
-                return Trace.currentSpan();
-            }
-            
-        });
-        
 
         Span result = (Span)aspect.process(pjp, traceable);
         
@@ -116,25 +92,8 @@ public class TraceableAspectTest {
 
     @Test
     public void continueThreadTrace() throws Throwable {
-
-
+        mockAspectBehavior(new AnswereMock());
         
-        
-        when(pjp.getSignature()).thenReturn(signature);
-        when(signature.getName()).thenReturn("coolMethod");
-        when(traceable.description()).thenReturn("some description");
-        when(pjp.proceed()).thenAnswer(new Answer() {
-
-            @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
-                if (!Trace.isTracing()) {
-                    throw new RuntimeException("Tracing not started");
-                };
-                return Trace.currentSpan();
-            }
-            
-        });
-
         TraceScope traceScope = Trace.startSpan("test trace", Sampler.ALWAYS);
         Span result = (Span)aspect.process(pjp, traceable);
         traceScope.close();        
@@ -145,4 +104,15 @@ public class TraceableAspectTest {
 
     }
 
+    class AnswereMock implements Answer<Span> {
+
+        @Override
+        public Span answer(InvocationOnMock invocation) throws Throwable {
+            if (!Trace.isTracing()) {
+                throw new RuntimeException("Tracing not started");
+            };
+            return Trace.currentSpan();
+        }
+        
+    }
 }
