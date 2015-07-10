@@ -18,7 +18,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import no.nb.htrace.core.HTraceHttpHeaders;
 
 public class TraceableRequest {
-    private final static Random random = new SecureRandom();
+    private static final Random random = new SecureRandom();
     
     private HttpServletRequest request;
     private HttpServletResponse response;

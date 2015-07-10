@@ -1,10 +1,12 @@
 package no.nb.htrace.zuul.filters;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.fail;
 
 import java.util.Map;
 
+import org.apache.htrace.Trace;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,6 +32,11 @@ public class HTraceZuulPreFilterTest {
         ctx.setRequest(this.request);
     }
     
+    @After
+    public void tearDown() {
+        Trace.currentSpan().stop();
+    }
+    
     @Test
     public void startNewTrace () {
 
@@ -37,8 +44,10 @@ public class HTraceZuulPreFilterTest {
         RequestContext ctx = RequestContext.getCurrentContext();
         Map<String, String> requestHeaders = ctx.getZuulRequestHeaders();
 
+        assertNotNull("It should be a span in Trace", Trace.currentSpan());
         assertNotNull(HTraceHttpHeaders.TRACE_ID + " should not be null", requestHeaders.get(HTraceHttpHeaders.TRACE_ID.toLowerCase()));
         assertNotNull(HTraceHttpHeaders.SPAN_ID + " should not be null", requestHeaders.get(HTraceHttpHeaders.SPAN_ID.toLowerCase()));
+        assertEquals("Description should be \"zuul\"", "zuul", Trace.currentSpan().getDescription());
     }
     
 
