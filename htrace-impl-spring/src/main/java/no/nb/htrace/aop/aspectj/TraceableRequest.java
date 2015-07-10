@@ -77,8 +77,7 @@ public class TraceableRequest {
         if (Trace.isTracing()) {
             return Trace.currentSpan();
         } else {
-            return new MilliSpan(getDescription(), getTraceId(), getSpanId(),
-                    random.nextLong(), "Unknown");
+            return Trace.startSpan(getDescription(), new TraceInfo(getTraceId(), getSpanId())).getSpan();
         }
     }
 
