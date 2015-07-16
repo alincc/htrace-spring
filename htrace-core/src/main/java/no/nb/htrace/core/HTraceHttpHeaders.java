@@ -1,11 +1,25 @@
 package no.nb.htrace.core;
 
-public interface HTraceHttpHeaders {
+public enum HTraceHttpHeaders {
     
-    public static String TRACE_ID = "X-B3-TraceId";
-    public static String SPAN_ID = "X-B3-SpanId";
-    public static String PARENT_SPAN_ID = "X-B3-ParentSpanId";
-    public static String SAMPLED = "X-B3-Sampled";
-    public static String FLAGS = "X-B3-Flags";
+    TRACE_ID("X-B3-TraceId"),
+    SPAN_ID("X-B3-SpanId"),
+    PARENT_SPAN_ID("X-B3-ParentSpanId"),
+    SAMPLED("X-B3-Sampled"),
+    FLAGS("X-B3-Flags");
+    
+    private final String header;
 
+    HTraceHttpHeaders(String header) {
+        this.header = header;
+    }
+
+    public String getHeader() {
+        return header;
+    }
+
+    @Override
+    public String toString() {
+        return this.getHeader();
+    }
 }

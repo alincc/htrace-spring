@@ -41,8 +41,8 @@ public class HTraceFeignInterceptorTest {
         Map<String, Collection<String>> headers = requestTemplate.headers();
         Span span = traceScope.getSpan();
         
-        headersShouldContain(HTraceHttpHeaders.TRACE_ID, ""+span.getTraceId(), headers);
-        headersShouldContain(HTraceHttpHeaders.SPAN_ID, ""+span.getSpanId(), headers);
+        headersShouldContain(HTraceHttpHeaders.TRACE_ID.toString(), ""+span.getTraceId(), headers);
+        headersShouldContain(HTraceHttpHeaders.SPAN_ID.toString(), ""+span.getSpanId(), headers);
 
     }
 

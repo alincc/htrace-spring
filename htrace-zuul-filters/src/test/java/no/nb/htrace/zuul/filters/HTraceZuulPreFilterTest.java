@@ -43,8 +43,8 @@ public class HTraceZuulPreFilterTest {
         RequestContext ctx = RequestContext.getCurrentContext();
         Map<String, String> requestHeaders = ctx.getZuulRequestHeaders();
 
-        assertNotNull(HTraceHttpHeaders.TRACE_ID + " should not be null", requestHeaders.get(HTraceHttpHeaders.TRACE_ID.toLowerCase()));
-        assertNotNull(HTraceHttpHeaders.SPAN_ID + " should not be null", requestHeaders.get(HTraceHttpHeaders.SPAN_ID.toLowerCase()));
+        assertNotNull(HTraceHttpHeaders.TRACE_ID.toString() + " should not be null", requestHeaders.get(HTraceHttpHeaders.TRACE_ID.toString().toLowerCase()));
+        assertNotNull(HTraceHttpHeaders.SPAN_ID.toString() + " should not be null", requestHeaders.get(HTraceHttpHeaders.SPAN_ID.toString().toLowerCase()));
         assertEquals("Description should be \"zuul\"", "zuul", Trace.currentSpan().getDescription());
     }
     

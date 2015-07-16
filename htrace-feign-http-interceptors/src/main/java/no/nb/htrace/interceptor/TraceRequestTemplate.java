@@ -14,11 +14,11 @@ public class TraceRequestTemplate {
 
     public void addTraceHeadersToTemplate(Span span) {
         if (span != null) {
-            requestTemplate.header(HTraceHttpHeaders.TRACE_ID, ""+span.getTraceId());
-            requestTemplate.header(HTraceHttpHeaders.SPAN_ID, ""+span.getSpanId());
-            requestTemplate.header(HTraceHttpHeaders.PARENT_SPAN_ID, ""+span.getParentId());
-            requestTemplate.header(HTraceHttpHeaders.SAMPLED, "1");
-            requestTemplate.header(HTraceHttpHeaders.FLAGS, "1");
+            requestTemplate.header(HTraceHttpHeaders.TRACE_ID.toString(), ""+span.getTraceId());
+            requestTemplate.header(HTraceHttpHeaders.SPAN_ID.toString(), ""+span.getSpanId());
+            requestTemplate.header(HTraceHttpHeaders.PARENT_SPAN_ID.toString(), ""+span.getParentId());
+            requestTemplate.header(HTraceHttpHeaders.SAMPLED.toString(), "1");
+            requestTemplate.header(HTraceHttpHeaders.FLAGS.toString(), "1");
         }
     }
 

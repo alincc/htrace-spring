@@ -73,15 +73,15 @@ public class TraceableRequest {
     }
 
     public boolean isTracing() {
-        return Trace.isTracing() || request.getHeader(HTraceHttpHeaders.TRACE_ID) != null ? true : false;
+        return Trace.isTracing() || request.getHeader(HTraceHttpHeaders.TRACE_ID.toString()) != null ? true : false;
     }
 
     private long getSpanId() {
-        return Long.parseLong(request.getHeader(HTraceHttpHeaders.SPAN_ID));
+        return Long.parseLong(request.getHeader(HTraceHttpHeaders.SPAN_ID.toString()));
     }
 
     private long getTraceId() {
-        return Long.parseLong(request.getHeader(HTraceHttpHeaders.TRACE_ID));
+        return Long.parseLong(request.getHeader(HTraceHttpHeaders.TRACE_ID.toString()));
     }
 
     public String getDescription() {

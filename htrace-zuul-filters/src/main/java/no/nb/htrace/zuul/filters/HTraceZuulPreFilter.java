@@ -20,8 +20,8 @@ public class HTraceZuulPreFilter extends ZuulFilter  {
         RequestContext ctx = RequestContext.getCurrentContext();
 
         ctx.getRequest().setAttribute("SPAN", span);
-        ctx.addZuulRequestHeader(HTraceHttpHeaders.TRACE_ID, ""+span.getSpan().getTraceId());
-        ctx.addZuulRequestHeader(HTraceHttpHeaders.SPAN_ID, ""+span.getSpan().getSpanId());
+        ctx.addZuulRequestHeader(HTraceHttpHeaders.TRACE_ID.toString(), ""+span.getSpan().getTraceId());
+        ctx.addZuulRequestHeader(HTraceHttpHeaders.SPAN_ID.toString(), ""+span.getSpan().getSpanId());
         
         return null;
     }

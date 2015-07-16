@@ -65,8 +65,8 @@ public class TraceableAspectTest {
     public void continueRemoteTrace() throws Throwable {
         mockAspectBehavior(new AnswereMock());
         Map<String, String> headers = new HashMap<>();
-        headers.put(HTraceHttpHeaders.TRACE_ID, "123");
-        headers.put(HTraceHttpHeaders.SPAN_ID, "456");
+        headers.put(HTraceHttpHeaders.TRACE_ID.toString(), "123");
+        headers.put(HTraceHttpHeaders.SPAN_ID.toString(), "456");
         mockRequest(headers);
 
         Span result = (Span)aspect.process(pjp, traceable);
