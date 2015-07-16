@@ -1,7 +1,6 @@
 package no.nb.htrace.aop.aspectj;
 
-import java.security.SecureRandom;
-import java.util.Random;
+import java.util.Arrays;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -18,12 +17,11 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import no.nb.htrace.core.HTraceHttpHeaders;
 
 public class TraceableRequest {
-    private static final Random random = new SecureRandom();
-    
     private HttpServletRequest request;
     private HttpServletResponse response;
     private TraceScope traceScope;
     private String description;
+    private String processId;
 
     public TraceableRequest() {
         super();
@@ -36,12 +34,13 @@ public class TraceableRequest {
         this.description = description;
     }
 
-    public void startTrace() {
+    public TraceScope startTrace() {
         if (isTracing()) {
             traceScope = Trace.startSpan(getDescription(), getCurrentSpan());
         } else {
             traceScope = Trace.startSpan(getDescription(), Sampler.ALWAYS);
         }
+        return traceScope;
     }
 
     public void endTrace() {
@@ -77,7 +76,7 @@ public class TraceableRequest {
         if (Trace.isTracing()) {
             return Trace.currentSpan();
         } else {
-            return Trace.startSpan(getDescription(), new TraceInfo(getTraceId(), getSpanId())).getSpan();
+            return new MilliSpan(getDescription(), getTraceId(), getSpanId(), getSpanId(), getProcessId());
         }
     }
 
@@ -108,6 +107,18 @@ public class TraceableRequest {
 
     private void annotatateSpanWithRequestInfo(TraceScope traceScope) {
         traceScope.getSpan().addKVAnnotation("request".getBytes(), (request.getMethod() + " " + request.getRequestURI()).getBytes());
+    }
+
+    public String getProcessId() {
+        if (processId  == null) {
+            return "unkonwn";
+        } else {
+            return processId;
+        }
+    }
+
+    public void setProcessId(String processId) {
+        this.processId = processId;
     }
 
 }

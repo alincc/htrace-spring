@@ -1,6 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.cloud</groupId>
+        <artifactId>spring-cloud-starter-parent</artifactId>
+        <version>Angel.SR3</version>
+    </parent>
 
     <groupId>no.nb.htrace</groupId>
     <artifactId>htrace-spring</artifactId>
@@ -10,15 +16,11 @@
     <name>htrace-spring</name>
     <description>Demo project for Spring Boot</description>
 
-    <parent>
-        <groupId>org.springframework.cloud</groupId>
-        <artifactId>spring-cloud-starter-parent</artifactId>
-        <version>1.0.2.RELEASE</version>
-        <relativePath/> <!-- lookup parent from repository -->
-    </parent>
 
     <properties>
         <java.version>1.8</java.version>
+        <spring-cloud.version>Angel.SR3</spring-cloud.version>
+        <htrace.version>3.1.0-incubating</htrace.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
         <sonar.coverage.exclusions>**/NullHttpServlet*</sonar.coverage.exclusions>
@@ -26,20 +28,61 @@
         <sonar.jacoco.reportPath>${project.basedir}/../target/jacoco.exec</sonar.jacoco.reportPath>
         <sonar.language>java</sonar.language>
     </properties>
-    
+
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.springframework.cloud</groupId>
+                <artifactId>spring-cloud-starter-parent</artifactId>
+                <version>${spring-cloud.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.htrace</groupId>
+                <artifactId>htrace-core</artifactId>
+                <version>${htrace.version}</version>
+            </dependency>
+
+            <dependency>
+                <groupId>org.apache.htrace</groupId>
+                <artifactId>htrace-zipkin</artifactId>
+                <version>${htrace.version}</version>
+            </dependency>
+
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <dependency>
+            <groupId>com.google.guava</groupId>
+            <artifactId>guava</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpcore</artifactId>
+            <version>4.4.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.scala-lang</groupId>
+            <artifactId>scala-library</artifactId>
+            <version>2.10.4</version>
+        </dependency>
+    </dependencies>
+
     <modules>
         <module>htrace-core</module>
         <module>htrace-impl-spring</module>
         <module>htrace-feign-http-interceptors</module>
         <module>htrace-zuul-filters</module>
     </modules>
-    
+
     <scm>
         <url>https://github.com/NationalLibraryOfNorway/htrace-spring.git</url>
         <connection>scm:git:git://github.com/NationalLibraryOfNorway/htrace-spring.git</connection>
         <developerConnection>scm:git:git@github.com:NationalLibraryOfNorway/htrace-spring.git</developerConnection>
     </scm>
-    
+
     <distributionManagement>
         <snapshotRepository>
             <id>snapshots</id>
@@ -52,39 +95,6 @@
             <url>http://utvikling.nb.no:8091/artifactory/libs-releases-local</url>
         </repository>
     </distributionManagement>
-    
-    <dependencies>
-        <dependency>
-            <groupId>org.apache.htrace</groupId>
-            <artifactId>htrace-core</artifactId>
-            <version>3.1.0-incubating</version>
-        </dependency>
-
-        <dependency>
-            <groupId>org.apache.htrace</groupId>
-            <artifactId>htrace-zipkin</artifactId>
-            <version>3.1.0-incubating</version>
-        </dependency>
-        <dependency>
-            <groupId>com.google.guava</groupId>
-            <artifactId>guava</artifactId>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpcore</artifactId>
-            <version>4.4.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-test</artifactId>
-            <scope>test</scope>
-        </dependency>
-        <dependency>
-            <groupId>org.scala-lang</groupId>
-            <artifactId>scala-library</artifactId>
-            <version>2.10.4</version>
-        </dependency>
-    </dependencies>
 
     <build>
         <pluginManagement>

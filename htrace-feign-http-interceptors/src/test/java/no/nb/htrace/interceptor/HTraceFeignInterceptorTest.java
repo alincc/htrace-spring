@@ -43,7 +43,6 @@ public class HTraceFeignInterceptorTest {
         
         headersShouldContain(HTraceHttpHeaders.TRACE_ID, ""+span.getTraceId(), headers);
         headersShouldContain(HTraceHttpHeaders.SPAN_ID, ""+span.getSpanId(), headers);
-        headersShouldContain(HTraceHttpHeaders.PARENT_SPAN_ID, ""+span.getParentId(), headers);
 
     }
 

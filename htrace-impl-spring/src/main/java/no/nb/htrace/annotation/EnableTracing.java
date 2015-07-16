@@ -16,5 +16,4 @@ import org.springframework.context.annotation.Import;
 @EnableAspectJAutoProxy
 @Import({no.nb.htrace.config.HTraceConfig.class, TraceableAspect.class, HTraceFeignInterceptor.class})
 public @interface EnableTracing {
-
 }

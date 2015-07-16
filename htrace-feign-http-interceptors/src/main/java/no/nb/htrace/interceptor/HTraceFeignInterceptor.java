@@ -12,7 +12,6 @@ public class HTraceFeignInterceptor implements RequestInterceptor {
 
     @Override
     public void apply(RequestTemplate requestTemplate) {
-        
         TraceRequestTemplate traceRequestTemplate = new TraceRequestTemplate(requestTemplate);
         traceRequestTemplate.addTraceHeadersToTemplate(getCurrentSpan());
     }
