@@ -26,7 +26,7 @@ public class HTraceConfig {
     }
     
     @Bean
-    public ApplicationListener<EmbeddedServletContainerInitializedEvent> EmbeddedServletContainerInitialized$listener1() {
+    public ApplicationListener<EmbeddedServletContainerInitializedEvent> embeddedServletContainerListener() {
         return new EmbeddedServletApplicationListener(collectorHostname, serviceName);
     }
 }

@@ -1,14 +1,11 @@
 package no.nb.htrace.aop.aspectj;
 
-import java.util.Arrays;
-
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.htrace.Sampler;
 import org.apache.htrace.Span;
 import org.apache.htrace.Trace;
-import org.apache.htrace.TraceInfo;
 import org.apache.htrace.TraceScope;
 import org.apache.htrace.impl.MilliSpan;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -27,11 +24,6 @@ public class TraceableRequest {
         super();
         this.request = getRequestFromContext();
         this.response = getResponseFromContext();
-    }
-
-    public TraceableRequest(String description) {
-        this();
-        this.description = description;
     }
 
     public TraceScope startTrace() {
@@ -84,10 +76,6 @@ public class TraceableRequest {
         return Trace.isTracing() || request.getHeader(HTraceHttpHeaders.TRACE_ID) != null ? true : false;
     }
 
-    public TraceInfo getTraceInfo() {
-        return new TraceInfo(getTraceId(), getSpanId());
-    }
-
     private long getSpanId() {
         return Long.parseLong(request.getHeader(HTraceHttpHeaders.SPAN_ID));
     }
@@ -111,7 +99,7 @@ public class TraceableRequest {
 
     public String getProcessId() {
         if (processId  == null) {
-            return "unkonwn";
+            return "unknown";
         } else {
             return processId;
         }
