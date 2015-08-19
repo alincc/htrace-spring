@@ -1,7 +1,6 @@
 package no.nb.htrace.zuul.filters;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.*;
 
 import java.util.Map;
 
@@ -34,19 +33,15 @@ public class HTraceZuulPreFilterTest {
     
     @After
     public void tearDown() {
-        Trace.currentSpan().stop();
+        if (Trace.currentSpan() != null) {
+            Trace.currentSpan().stop();
+        }
     }
     
     @Test
     public void testNoTracing () {
-        filter.run();
-        RequestContext ctx = RequestContext.getCurrentContext();
-        Map<String, String> requestHeaders = ctx.getZuulRequestHeaders();
-
-        assertNotNull(HTraceHttpHeaders.TRACE_ID.toString() + " should not be null", requestHeaders.get(HTraceHttpHeaders.TRACE_ID.toString().toLowerCase()));
-        assertNotNull(HTraceHttpHeaders.SPAN_ID.toString() + " should not be null", requestHeaders.get(HTraceHttpHeaders.SPAN_ID.toString().toLowerCase()));
-        assertEquals(HTraceHttpHeaders.SAMPLED.toString() + " should be 0", "0", requestHeaders.get(HTraceHttpHeaders.SAMPLED.toString().toLowerCase()));
-        assertEquals("Description should be \"zuul\"", "zuul", Trace.currentSpan().getDescription());
+        boolean shouldFilter = filter.shouldFilter();
+        assertFalse(shouldFilter);
     }
 
     @Test

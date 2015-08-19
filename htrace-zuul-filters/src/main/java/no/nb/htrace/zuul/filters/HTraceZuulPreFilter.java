@@ -24,7 +24,7 @@ public class HTraceZuulPreFilter extends ZuulFilter  {
         ctx.getRequest().setAttribute("SPAN", span);
         ctx.addZuulRequestHeader(HTraceHttpHeaders.TRACE_ID.toString(), ""+span.getSpan().getTraceId());
         ctx.addZuulRequestHeader(HTraceHttpHeaders.SPAN_ID.toString(), ""+span.getSpan().getSpanId());
-        ctx.addZuulRequestHeader(HTraceHttpHeaders.SAMPLED.toString(), getSampled(ctx.getRequest()));
+        ctx.addZuulRequestHeader(HTraceHttpHeaders.SAMPLED.toString(), "1");
         
         return null;
     }
@@ -36,7 +36,9 @@ public class HTraceZuulPreFilter extends ZuulFilter  {
 
     @Override
     public boolean shouldFilter() {
-        return true;
+        RequestContext ctx = RequestContext.getCurrentContext();
+        String sampled = getSampled(ctx.getRequest());
+        return "1".equals(sampled) ? true : false;
     }
 
     @Override
