@@ -1,6 +1,7 @@
 package no.nb.htrace.zuul.filters;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 
 import java.util.Map;
 
@@ -32,6 +33,12 @@ public class HTraceZuulPostFilterTest {
         RequestContext ctx = RequestContext.getCurrentContext();
         ctx.setRequest(request);
         ctx.setResponse(response);
+    }
+    
+    @Test
+    public void testNoTracing () {
+        boolean shouldFilter = filter.shouldFilter();
+        assertFalse(shouldFilter);
     }
     
     @Test

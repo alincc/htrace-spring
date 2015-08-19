@@ -8,6 +8,8 @@ import org.apache.htrace.TraceScope;
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
 
+import no.nb.htrace.core.HTraceHttpHeaders;
+
 public class HTraceZuulPostFilter extends ZuulFilter  {
 
     @Override
@@ -25,6 +27,23 @@ public class HTraceZuulPostFilter extends ZuulFilter  {
         return null;
     }
 
+    @Override
+    public boolean shouldFilter() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        String sampled = getSampled(ctx.getRequest());
+        return "1".equals(sampled) ? true : false;
+    }
+
+    @Override
+    public String filterType() {
+        return "post";
+    }
+
+    @Override
+    public int filterOrder() {
+        return 0;
+    }
+
     private TraceScope getTraceFromRequest() {
         HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
         return (TraceScope)request.getAttribute("SPAN");
@@ -40,19 +59,9 @@ public class HTraceZuulPostFilter extends ZuulFilter  {
         traceScope.getSpan().addKVAnnotation("http.responsecode".getBytes(), (""+response.getStatus()).getBytes());
     }
 
-    @Override
-    public boolean shouldFilter() {
-        return true;
-    }
-
-    @Override
-    public String filterType() {
-        return "post";
-    }
-
-    @Override
-    public int filterOrder() {
-        return 0;
+    private String getSampled(HttpServletRequest request) {
+        String sampled = request.getHeader(HTraceHttpHeaders.SAMPLED.toString());
+        return sampled != null ? sampled : "0";
     }
 
 }
