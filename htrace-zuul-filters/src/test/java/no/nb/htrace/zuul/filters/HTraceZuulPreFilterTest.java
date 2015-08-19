@@ -38,16 +38,29 @@ public class HTraceZuulPreFilterTest {
     }
     
     @Test
-    public void startNewTrace () {
+    public void testNoTracing () {
         filter.run();
         RequestContext ctx = RequestContext.getCurrentContext();
         Map<String, String> requestHeaders = ctx.getZuulRequestHeaders();
 
         assertNotNull(HTraceHttpHeaders.TRACE_ID.toString() + " should not be null", requestHeaders.get(HTraceHttpHeaders.TRACE_ID.toString().toLowerCase()));
         assertNotNull(HTraceHttpHeaders.SPAN_ID.toString() + " should not be null", requestHeaders.get(HTraceHttpHeaders.SPAN_ID.toString().toLowerCase()));
+        assertEquals(HTraceHttpHeaders.SAMPLED.toString() + " should be 0", "0", requestHeaders.get(HTraceHttpHeaders.SAMPLED.toString().toLowerCase()));
         assertEquals("Description should be \"zuul\"", "zuul", Trace.currentSpan().getDescription());
     }
-    
 
+    @Test
+    public void startNewTrace () {
+        this.request.addHeader(HTraceHttpHeaders.SAMPLED.toString(), "1");
+        
+        filter.run();
+        RequestContext ctx = RequestContext.getCurrentContext();
+        Map<String, String> requestHeaders = ctx.getZuulRequestHeaders();
+
+        assertNotNull(HTraceHttpHeaders.TRACE_ID.toString() + " should not be null", requestHeaders.get(HTraceHttpHeaders.TRACE_ID.toString().toLowerCase()));
+        assertNotNull(HTraceHttpHeaders.SPAN_ID.toString() + " should not be null", requestHeaders.get(HTraceHttpHeaders.SPAN_ID.toString().toLowerCase()));
+        assertEquals(HTraceHttpHeaders.SAMPLED.toString() + " should be 1", "1", requestHeaders.get(HTraceHttpHeaders.SAMPLED.toString().toLowerCase()));
+        assertEquals("Description should be \"zuul\"", "zuul", Trace.currentSpan().getDescription());
+    }
 
 }
