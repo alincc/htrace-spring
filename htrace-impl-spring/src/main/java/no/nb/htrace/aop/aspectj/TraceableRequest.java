@@ -48,7 +48,7 @@ public class TraceableRequest {
         return RequestContextHolder.getRequestAttributes() != null ? true : false;
     }
     
-    private HttpServletRequest getRequestFromContext() {
+    protected HttpServletRequest getRequestFromContext() {
         if (isRequestBoundToThread()) {
             ServletRequestAttributes t = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
             return t.getRequest();

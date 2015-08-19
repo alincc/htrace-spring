@@ -1,8 +1,11 @@
 package no.nb.htrace.aop.aspectj;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.aspectj.lang.ProceedingJoinPoint;
 
 import no.nb.htrace.annotation.Traceable;
+import no.nb.htrace.core.HTraceHttpHeaders;
 
 public class AopTraceableRequest extends TraceableRequest {
     private Traceable traceable;
@@ -21,6 +24,12 @@ public class AopTraceableRequest extends TraceableRequest {
             description = traceable.description();
         }
         return description;
+    }
+
+    public boolean shouldTrace() {
+        HttpServletRequest request = getRequestFromContext();
+        String sampled = request.getHeader(HTraceHttpHeaders.SAMPLED.toString());
+        return (sampled != null && sampled.equals("1")) ?  true : false;
     }
     
     

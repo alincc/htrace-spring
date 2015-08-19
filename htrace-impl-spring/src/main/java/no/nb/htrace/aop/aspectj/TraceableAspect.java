@@ -20,12 +20,25 @@ public class TraceableAspect {
         AopTraceableRequest traceableRequest = new AopTraceableRequest(pjp, traceable);
         traceableRequest.setProcessId(processId);
 
+        if (traceableRequest.shouldTrace()) {
+            return traceAndProceed(pjp, traceableRequest);
+        } else {
+            return proceed(pjp);
+        }
+    }
+
+    private Object traceAndProceed(ProceedingJoinPoint pjp,
+            AopTraceableRequest traceableRequest) throws Throwable {
         traceableRequest.startTrace();
         try {
-            return pjp.proceed();
+            return proceed(pjp);
         } finally {
             traceableRequest.endTrace();
         }
+    }
+
+    private Object proceed(ProceedingJoinPoint pjp) throws Throwable {
+        return pjp.proceed();
     }
 
 }

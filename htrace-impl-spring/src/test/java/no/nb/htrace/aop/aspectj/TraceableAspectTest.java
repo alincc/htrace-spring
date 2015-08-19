@@ -49,11 +49,25 @@ public class TraceableAspectTest {
     public void setUp() {
         aspect = new TraceableAspect();
     }
+    
+    @Test(expected = TracingNotStartedException.class)
+    public void ifSampledIs0ThenNoTrace() throws Throwable {
+        mockAspectBehavior(new AnswereMock());
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HTraceHttpHeaders.TRACE_ID.toString(), "123");
+        headers.put(HTraceHttpHeaders.SPAN_ID.toString(), "456");
+        headers.put(HTraceHttpHeaders.SAMPLED.toString(), "0");
+        mockRequest(headers);
+
+        aspect.process(pjp, traceable);
+    }
 
     @Test
     public void startNewTrace() throws Throwable {
         mockAspectBehavior(new AnswereMock());
-        mockRequest(new HashMap<>());
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HTraceHttpHeaders.SAMPLED.toString(), "1");
+        mockRequest(headers);
 
         Span result = (Span)aspect.process(pjp, traceable);
         
@@ -67,6 +81,7 @@ public class TraceableAspectTest {
         Map<String, String> headers = new HashMap<>();
         headers.put(HTraceHttpHeaders.TRACE_ID.toString(), "123");
         headers.put(HTraceHttpHeaders.SPAN_ID.toString(), "456");
+        headers.put(HTraceHttpHeaders.SAMPLED.toString(), "1");
         mockRequest(headers);
 
         Span result = (Span)aspect.process(pjp, traceable);
@@ -114,7 +129,7 @@ public class TraceableAspectTest {
         @Override
         public Span answer(InvocationOnMock invocation) throws Throwable {
             if (!Trace.isTracing()) {
-                throw new RuntimeException("Tracing not started");
+                throw new TracingNotStartedException("Tracing not started");
             };
             return Trace.currentSpan();
         }
