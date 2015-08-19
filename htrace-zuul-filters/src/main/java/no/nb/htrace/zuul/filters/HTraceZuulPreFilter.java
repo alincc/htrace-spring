@@ -29,11 +29,6 @@ public class HTraceZuulPreFilter extends ZuulFilter  {
         return null;
     }
 
-    private String getSampled(HttpServletRequest request) {
-        String sampled = request.getHeader(HTraceHttpHeaders.SAMPLED.toString());
-        return sampled != null ? sampled : "0";
-    }
-
     @Override
     public boolean shouldFilter() {
         RequestContext ctx = RequestContext.getCurrentContext();
@@ -49,6 +44,11 @@ public class HTraceZuulPreFilter extends ZuulFilter  {
     @Override
     public int filterOrder() {
         return 0;
+    }
+
+    private String getSampled(HttpServletRequest request) {
+        String sampled = request.getHeader(HTraceHttpHeaders.SAMPLED.toString());
+        return sampled != null ? sampled : "0";
     }
 
 }
