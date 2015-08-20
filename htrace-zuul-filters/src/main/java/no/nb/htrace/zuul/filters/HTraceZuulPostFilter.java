@@ -66,6 +66,7 @@ public class HTraceZuulPostFilter extends ZuulFilter  {
     private void annotateTraceSpanWithResponse(TraceScope traceScope) {
         HttpServletResponse response = getResponseFromContext();
         traceScope.getSpan().addKVAnnotation("http.responsecode".getBytes(), (""+response.getStatus()).getBytes());
+        traceScope.getSpan().addKVAnnotation("traceId".getBytes(), (""+traceScope.getSpan().getTraceId()).getBytes());
     }
 
     private String getSampled(HttpServletRequest request) {

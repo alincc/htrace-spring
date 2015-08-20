@@ -60,6 +60,8 @@ public class HTraceZuulPostFilterTest {
                 assertEquals("ResponseCode should be 200", "200", value);
             } else if (key.equals("request")) {
                 assertEquals("Request should be \"GET /test\"", "GET /test", value);
+            } else if (key.equals("traceId")) {
+                assertEquals("TraceId should be \""+traceScope.getSpan().getTraceId()+"\"", ""+traceScope.getSpan().getTraceId(), value);
             }
         });
     }
