@@ -4,6 +4,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.apache.htrace.TraceScope;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import com.netflix.zuul.ZuulFilter;
 import com.netflix.zuul.context.RequestContext;
@@ -22,9 +24,16 @@ public class HTraceZuulPostFilter extends ZuulFilter  {
 
         annotateTraceSpanWithResponse(traceScope);
         
+        addTraceHeadersToResponse(traceScope);
+        
         traceScope.close();
         
         return null;
+    }
+
+    private void addTraceHeadersToResponse(TraceScope traceScope) {
+        HttpServletResponse response = getResponseFromContext();
+        response.addHeader("traceId", "" + traceScope.getSpan().getTraceId());
     }
 
     @Override
@@ -45,17 +54,17 @@ public class HTraceZuulPostFilter extends ZuulFilter  {
     }
 
     private TraceScope getTraceFromRequest() {
-        HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
+        HttpServletRequest request = getRequestFromContext();
         return (TraceScope)request.getAttribute("SPAN");
     }
 
     private void annotateTraceSpanWithRequest(TraceScope traceScope) {
-        HttpServletRequest request = RequestContext.getCurrentContext().getRequest();
+        HttpServletRequest request = getRequestFromContext();
         traceScope.getSpan().addKVAnnotation("request".getBytes(), (request.getMethod() + " " + request.getRequestURI()).getBytes());
     }
 
     private void annotateTraceSpanWithResponse(TraceScope traceScope) {
-        HttpServletResponse response = RequestContext.getCurrentContext().getResponse();
+        HttpServletResponse response = getResponseFromContext();
         traceScope.getSpan().addKVAnnotation("http.responsecode".getBytes(), (""+response.getStatus()).getBytes());
     }
 
@@ -63,5 +72,14 @@ public class HTraceZuulPostFilter extends ZuulFilter  {
         String sampled = request.getHeader(HTraceHttpHeaders.SAMPLED.toString());
         return sampled != null ? sampled : "0";
     }
+    
+    protected HttpServletRequest getRequestFromContext() {
+        return RequestContext.getCurrentContext().getRequest();
+    }
+
+    private HttpServletResponse getResponseFromContext() {
+        return RequestContext.getCurrentContext().getResponse();  
+    }
+
 
 }

@@ -64,6 +64,20 @@ public class HTraceZuulPostFilterTest {
         });
     }
     
+    @Test
+    public void ifRequestIsTracedThenReturnTraceIdInResponse() {
+        TraceScope traceScope = Trace.startSpan("test", Sampler.ALWAYS);
+        request.setMethod(HttpMethod.GET.name());
+        request.setRequestURI("/test");
+        request.setAttribute("SPAN", traceScope);
+        
+        filter.run();
+        traceScope.close();
+        
+        assertEquals(""+traceScope.getSpan().getTraceId(), response.getHeader("traceId"));
+        
+    }
+    
 
 
 }
