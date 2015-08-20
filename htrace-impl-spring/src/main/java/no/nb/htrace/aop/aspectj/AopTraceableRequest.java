@@ -29,7 +29,7 @@ public class AopTraceableRequest extends TraceableRequest {
     public boolean shouldTrace() {
         HttpServletRequest request = getRequestFromContext();
         String sampled = request.getHeader(HTraceHttpHeaders.SAMPLED.toString());
-        return (sampled != null && sampled.equals("1")) ?  true : false;
+        return (sampled != null && "1".equals(sampled)) ?  true : false;
     }
     
     
