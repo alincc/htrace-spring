@@ -43,7 +43,7 @@ public class HTraceZuulPreFilter extends ZuulFilter  {
 
     @Override
     public int filterOrder() {
-        return 0;
+        return 1;
     }
 
     private String getSampled(HttpServletRequest request) {

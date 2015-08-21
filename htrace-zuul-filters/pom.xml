@@ -44,6 +44,13 @@
             <artifactId>spring-boot-starter-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>com.netflix.zuul</groupId>
+            <artifactId>zuul-netflix</artifactId>
+            <version>1.0.28</version>
+            <scope>test</scope>
+        </dependency>
         
     </dependencies>
 
