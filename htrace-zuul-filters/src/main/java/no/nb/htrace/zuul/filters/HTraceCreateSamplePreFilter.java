@@ -8,20 +8,21 @@ import com.netflix.zuul.context.RequestContext;
 import no.nb.htrace.core.HTraceHttpHeaders;
 
 class HTraceCreateSamplePreFilter extends ZuulFilter {
-    HTraceCreateSamplePreFilterData data = new HTraceCreateSamplePreFilterData();
-
+    final int limit;
+    final AtomicInteger counter;
+    
     public HTraceCreateSamplePreFilter() {
         this(100);
     }
     
     public HTraceCreateSamplePreFilter(int limit) {
-        this.data.limit = limit;
-        data.counter = new AtomicInteger();
+        this.limit = limit;
+        counter = new AtomicInteger();
     }
     
     @Override
     public boolean shouldFilter() {
-        if (data.counter.incrementAndGet()%data.limit == 0) {
+        if (counter.incrementAndGet()%limit == 0) {
             return true;
         } else {
             return false;
