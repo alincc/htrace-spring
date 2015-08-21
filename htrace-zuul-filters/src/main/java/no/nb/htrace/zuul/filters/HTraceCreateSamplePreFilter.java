@@ -31,6 +31,8 @@ class HTraceCreateSamplePreFilter extends ZuulFilter {
 
     @Override
     public Object run() {
+        RequestContext.getCurrentContext().set("javaPreFilter-ran", true);
+        
         RequestContext ctx = RequestContext.getCurrentContext();
         ctx.addZuulRequestHeader(HTraceHttpHeaders.SAMPLED.toString(), "1");
         return null;
