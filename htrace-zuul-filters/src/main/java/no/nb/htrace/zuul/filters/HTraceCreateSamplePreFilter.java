@@ -7,7 +7,7 @@ import com.netflix.zuul.context.RequestContext;
 
 import no.nb.htrace.core.HTraceHttpHeaders;
 
-class HTraceCreateSamplePreFilter extends ZuulFilter {
+public class HTraceCreateSamplePreFilter extends ZuulFilter {
     final int limit;
     final AtomicInteger counter;
     
