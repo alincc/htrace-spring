@@ -22,11 +22,7 @@ public class HTraceCreateSamplePreFilter extends ZuulFilter {
     
     @Override
     public boolean shouldFilter() {
-        if (counter.incrementAndGet()%limit == 0) {
-            return true;
-        } else {
-            return false;
-        }
+        return counter.incrementAndGet()%limit == 0;
     }
 
     @Override
