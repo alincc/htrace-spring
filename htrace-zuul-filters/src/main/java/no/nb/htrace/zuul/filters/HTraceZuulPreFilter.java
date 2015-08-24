@@ -51,6 +51,9 @@ public class HTraceZuulPreFilter extends ZuulFilter  {
         RequestContext ctx = RequestContext.getCurrentContext();
         Map<String, String> requestHeaders = ctx.getZuulRequestHeaders();
         String sampled = requestHeaders.get(HTraceHttpHeaders.SAMPLED.toString().toLowerCase());
+        if (sampled == null) {
+            sampled = ctx.getRequest().getHeader(HTraceHttpHeaders.SAMPLED.toString());
+        }
         return sampled != null ? sampled : "0";
     }
 
