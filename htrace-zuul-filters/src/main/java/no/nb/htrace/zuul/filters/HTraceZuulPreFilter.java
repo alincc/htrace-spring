@@ -49,15 +49,7 @@ public class HTraceZuulPreFilter extends ZuulFilter  {
 
     private String getSampled() {
         String sampled = getSampledFromZuulRequestHeader();
-        if (sampled == null) {
-            sampled = getSampledfromHttpRequestHeader();
-        }
         return sampled != null ? sampled : "0";
-    }
-
-    private String getSampledfromHttpRequestHeader() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        return ctx.getRequest().getHeader(HTraceHttpHeaders.SAMPLED.toString());
     }
 
     private String getSampledFromZuulRequestHeader() {
