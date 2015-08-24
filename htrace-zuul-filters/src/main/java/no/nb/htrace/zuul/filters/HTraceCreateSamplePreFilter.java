@@ -8,29 +8,26 @@ import com.netflix.zuul.context.RequestContext;
 import no.nb.htrace.core.HTraceHttpHeaders;
 
 public class HTraceCreateSamplePreFilter extends ZuulFilter {
-    final int limit;
-    final AtomicInteger counter;
+    private static final int DEFAULT_STEP_SIZE = 100;
+    final AtomicInteger counter = new AtomicInteger();
+    final int stepSize;
     
     public HTraceCreateSamplePreFilter() {
-        this(100);
+        this(DEFAULT_STEP_SIZE);
     }
     
-    public HTraceCreateSamplePreFilter(int limit) {
-        this.limit = limit;
-        counter = new AtomicInteger();
+    public HTraceCreateSamplePreFilter(int stepSize) {
+        this.stepSize = stepSize;
     }
     
     @Override
     public boolean shouldFilter() {
-        return counter.incrementAndGet()%limit == 0;
+        return isCounterAtStepSize();
     }
 
     @Override
     public Object run() {
-        RequestContext.getCurrentContext().set("javaPreFilter-ran", true);
-        
-        RequestContext ctx = RequestContext.getCurrentContext();
-        ctx.addZuulRequestHeader(HTraceHttpHeaders.SAMPLED.toString(), "1");
+        addZuulRequestHeader(HTraceHttpHeaders.SAMPLED.toString(), "1");
         return null;
     }
 
@@ -41,7 +38,15 @@ public class HTraceCreateSamplePreFilter extends ZuulFilter {
 
     @Override
     public int filterOrder() {
-        return 0;
+        return 1;
     }
     
+    private boolean isCounterAtStepSize() {
+        return counter.incrementAndGet()%stepSize == 0;
+    }
+
+    private void addZuulRequestHeader(String header, String value) {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        ctx.addZuulRequestHeader(header, value);
+    }
 }

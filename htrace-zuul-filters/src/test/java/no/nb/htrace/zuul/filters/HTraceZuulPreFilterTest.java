@@ -27,7 +27,8 @@ public class HTraceZuulPreFilterTest {
     public void setUp() {
         this.filter = new HTraceZuulPreFilter();
         
-        RequestContext ctx = RequestContext.getCurrentContext();
+        RequestContext ctx = new RequestContext();
+        RequestContext.testSetCurrentContext(ctx);
         ctx.setRequest(this.request);
     }
     
@@ -36,6 +37,8 @@ public class HTraceZuulPreFilterTest {
         if (Trace.currentSpan() != null) {
             Trace.currentSpan().stop();
         }
+        
+        RequestContext.testSetCurrentContext(null);
     }
     
     @Test

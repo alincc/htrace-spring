@@ -1,5 +1,7 @@
 package no.nb.htrace.zuul.filters;
 
+import java.util.Map;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
@@ -13,10 +15,14 @@ import no.nb.htrace.core.HTraceHttpHeaders;
 public class HTraceZuulPostFilter extends ZuulFilter  {
 
     @Override
-    public Object run() {
-        RequestContext.getCurrentContext().set("javaPostFilter-ran", true);
+    public boolean shouldFilter() {
+        String sampled = getSampled();
+        return "1".equals(sampled) ? true : false;
+    }
 
-        TraceScope traceScope = getTraceFromRequest();
+    @Override
+    public Object run() {
+        TraceScope traceScope = getTraceFromRequestContext();
         
         annotateTraceSpanWithRequest(traceScope);
 
@@ -29,18 +35,6 @@ public class HTraceZuulPostFilter extends ZuulFilter  {
         return null;
     }
 
-    private void addTraceHeadersToResponse(TraceScope traceScope) {
-        HttpServletResponse response = getResponseFromContext();
-        response.addHeader("traceId", "" + traceScope.getSpan().getTraceId());
-    }
-
-    @Override
-    public boolean shouldFilter() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        String sampled = getSampled(ctx.getRequest());
-        return "1".equals(sampled) ? true : false;
-    }
-
     @Override
     public String filterType() {
         return "post";
@@ -48,12 +42,24 @@ public class HTraceZuulPostFilter extends ZuulFilter  {
 
     @Override
     public int filterOrder() {
-        return 0;
+        return 3;
+    }
+    
+    @Override
+    public boolean isStaticFilter() {
+        return false;
     }
 
-    private TraceScope getTraceFromRequest() {
-        HttpServletRequest request = getRequestFromContext();
-        return (TraceScope)request.getAttribute("SPAN");
+    private String getSampled() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        Map<String, String> requestHeaders = ctx.getZuulRequestHeaders();
+        String sampled = requestHeaders.get(HTraceHttpHeaders.SAMPLED.toString().toLowerCase());
+        return sampled != null ? sampled : "0";
+    }
+    
+    private TraceScope getTraceFromRequestContext() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        return (TraceScope)ctx.getRequest().getAttribute("SPAN");
     }
 
     private void annotateTraceSpanWithRequest(TraceScope traceScope) {
@@ -67,9 +73,9 @@ public class HTraceZuulPostFilter extends ZuulFilter  {
         traceScope.getSpan().addKVAnnotation("traceId".getBytes(), (""+traceScope.getSpan().getTraceId()).getBytes());
     }
 
-    private String getSampled(HttpServletRequest request) {
-        String sampled = request.getHeader(HTraceHttpHeaders.SAMPLED.toString());
-        return sampled != null ? sampled : "0";
+    private void addTraceHeadersToResponse(TraceScope traceScope) {
+        HttpServletResponse response = getResponseFromContext();
+        response.addHeader("traceId", "" + traceScope.getSpan().getTraceId());
     }
     
     protected HttpServletRequest getRequestFromContext() {
@@ -79,6 +85,5 @@ public class HTraceZuulPostFilter extends ZuulFilter  {
     private HttpServletResponse getResponseFromContext() {
         return RequestContext.getCurrentContext().getResponse();  
     }
-
 
 }

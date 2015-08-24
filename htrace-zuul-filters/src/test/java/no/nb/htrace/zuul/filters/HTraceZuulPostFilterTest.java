@@ -8,6 +8,7 @@ import java.util.Map;
 import org.apache.htrace.Sampler;
 import org.apache.htrace.Trace;
 import org.apache.htrace.TraceScope;
+import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -30,9 +31,15 @@ public class HTraceZuulPostFilterTest {
     public void setUp() {
         this.filter = new HTraceZuulPostFilter();
         
-        RequestContext ctx = RequestContext.getCurrentContext();
+        RequestContext ctx = new RequestContext();
+        RequestContext.testSetCurrentContext(ctx);
         ctx.setRequest(request);
         ctx.setResponse(response);
+    }
+    
+    @After
+    public void reset() {
+        RequestContext.testSetCurrentContext(null);
     }
     
     @Test

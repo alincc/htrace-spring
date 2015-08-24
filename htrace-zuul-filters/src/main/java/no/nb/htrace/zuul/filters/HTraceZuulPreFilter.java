@@ -1,6 +1,6 @@
 package no.nb.htrace.zuul.filters;
 
-import javax.servlet.http.HttpServletRequest;
+import java.util.Map;
 
 import org.apache.htrace.Sampler;
 import org.apache.htrace.Trace;
@@ -14,13 +14,16 @@ import no.nb.htrace.core.HTraceHttpHeaders;
 public class HTraceZuulPreFilter extends ZuulFilter  {
 
     @Override
+    public boolean shouldFilter() {
+        String sampled = getSampled();
+        return "1".equals(sampled) ? true : false;
+    }
+    
+    @Override
     public Object run() {
-        RequestContext.getCurrentContext().set("javaPreFilter-ran", true);
-
         TraceScope span = Trace.startSpan("zuul", Sampler.ALWAYS);
         
         RequestContext ctx = RequestContext.getCurrentContext();
-
         ctx.getRequest().setAttribute("SPAN", span);
         ctx.addZuulRequestHeader(HTraceHttpHeaders.TRACE_ID.toString(), ""+span.getSpan().getTraceId());
         ctx.addZuulRequestHeader(HTraceHttpHeaders.SPAN_ID.toString(), ""+span.getSpan().getSpanId());
@@ -30,24 +33,24 @@ public class HTraceZuulPreFilter extends ZuulFilter  {
     }
 
     @Override
-    public boolean shouldFilter() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        String sampled = getSampled(ctx.getRequest());
-        return "1".equals(sampled) ? true : false;
-    }
-
-    @Override
     public String filterType() {
         return "pre";
     }
 
     @Override
     public int filterOrder() {
-        return 1;
+        return 2;
     }
 
-    private String getSampled(HttpServletRequest request) {
-        String sampled = request.getHeader(HTraceHttpHeaders.SAMPLED.toString());
+    @Override
+    public boolean isStaticFilter() {
+        return false;
+    }
+
+    private String getSampled() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        Map<String, String> requestHeaders = ctx.getZuulRequestHeaders();
+        String sampled = requestHeaders.get(HTraceHttpHeaders.SAMPLED.toString().toLowerCase());
         return sampled != null ? sampled : "0";
     }
 
