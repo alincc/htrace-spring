@@ -48,13 +48,22 @@ public class HTraceZuulPreFilter extends ZuulFilter  {
     }
 
     private String getSampled() {
-        RequestContext ctx = RequestContext.getCurrentContext();
-        Map<String, String> requestHeaders = ctx.getZuulRequestHeaders();
-        String sampled = requestHeaders.get(HTraceHttpHeaders.SAMPLED.toString().toLowerCase());
+        String sampled = getSampledFromZuulRequestHeader();
         if (sampled == null) {
-            sampled = ctx.getRequest().getHeader(HTraceHttpHeaders.SAMPLED.toString());
+            sampled = getSampledfromHttpRequestHeader();
         }
         return sampled != null ? sampled : "0";
+    }
+
+    private String getSampledfromHttpRequestHeader() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        return ctx.getRequest().getHeader(HTraceHttpHeaders.SAMPLED.toString());
+    }
+
+    private String getSampledFromZuulRequestHeader() {
+        RequestContext ctx = RequestContext.getCurrentContext();
+        Map<String, String> requestHeaders = ctx.getZuulRequestHeaders();
+        return requestHeaders.get(HTraceHttpHeaders.SAMPLED.toString().toLowerCase());
     }
 
 }
