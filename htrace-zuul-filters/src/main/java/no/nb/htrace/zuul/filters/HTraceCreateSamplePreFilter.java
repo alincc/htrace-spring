@@ -8,16 +8,16 @@ import com.netflix.zuul.context.RequestContext;
 import no.nb.htrace.core.HTraceHttpHeaders;
 
 public class HTraceCreateSamplePreFilter extends ZuulFilter {
-    private static final int DEFAULT_STEP_SIZE = 100;
+    private static final int DEFAULT_SAMPLE_RATE = 100;
     final AtomicInteger counter = new AtomicInteger();
-    final int stepSize;
+    final int sampleRate;
     
     public HTraceCreateSamplePreFilter() {
-        this(DEFAULT_STEP_SIZE);
+        this(DEFAULT_SAMPLE_RATE);
     }
     
-    public HTraceCreateSamplePreFilter(int stepSize) {
-        this.stepSize = stepSize;
+    public HTraceCreateSamplePreFilter(int sampleRate) {
+        this.sampleRate = sampleRate;
     }
     
     @Override
@@ -42,7 +42,7 @@ public class HTraceCreateSamplePreFilter extends ZuulFilter {
     }
     
     private boolean isCounterAtStepSize() {
-        return counter.incrementAndGet()%stepSize == 0;
+        return counter.incrementAndGet()%sampleRate == 0;
     }
 
     private void addZuulRequestHeader(String header, String value) {
