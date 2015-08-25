@@ -9,7 +9,7 @@ import no.nb.commons.web.util.UserUtils;
 import no.nb.htrace.core.HTraceHttpHeaders;
 
 public class HtraceAuthorizeSampleFilter extends ZuulFilter{
-    public final static String IP_RANGE = "158.39.";
+    public static final String IP_RANGE = "158.39.";
     
     @Override
     public boolean shouldFilter() {
@@ -28,7 +28,6 @@ public class HtraceAuthorizeSampleFilter extends ZuulFilter{
                 addZuulHeader(HTraceHttpHeaders.SAMPLED.toString(), "0");
             }
         }
-        System.out.println(RequestContext.getCurrentContext().getZuulRequestHeaders());
         return null;
     }
 
