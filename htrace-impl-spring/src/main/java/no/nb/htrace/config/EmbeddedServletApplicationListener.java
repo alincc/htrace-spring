@@ -32,8 +32,10 @@ public class EmbeddedServletApplicationListener implements ApplicationListener<E
     public void onApplicationEvent(
             EmbeddedServletContainerInitializedEvent event) {
 
-        Trace.addReceiver(spanReceiver(getServerHostName(), event
+        if (collectorHostname != null && !collectorHostname.isEmpty()) {
+            Trace.addReceiver(spanReceiver(getServerHostName(), event
                 .getEmbeddedServletContainer().getPort()));
+        }
 
     }
 

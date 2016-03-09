@@ -25,7 +25,7 @@
         <dependency>
             <groupId>no.nb.commons</groupId>
             <artifactId>commons-web-utils</artifactId>
-            <version>-15</version>
+            <version>0.0.1-19</version>
         </dependency>
 
         <dependency>
